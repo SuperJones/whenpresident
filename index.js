@@ -1,6 +1,7 @@
 var express = require("express");
+var parser = require("body-parser");
 var hbs     = require("express-handlebars");
-var db      = require("./db/connection");
+var mongoose      = require("./db/connection");
 
 var app     = express();
 
@@ -13,27 +14,37 @@ app.engine(".hbs", hbs({
   defaultLayout:  "layout-main"
 }));
 app.use("/assets", express.static("public"));
+app.use(parser.urlencoded({extended: true}));
+
+var Candidate = mongoose.model("Candidate");
+
 
 app.get("/", function(req, res){
   res.render("app-welcome");
 });
 
 app.get("/candidates", function(req, res){
-  res.render("candidates-index", {
-    candidates: db.candidates
+  Candidate.find({}).then(function(candidateFromDB){
+    res.render("candidates-index", {
+      candidates: candidateFromDB
+    });
   });
 });
 
 app.get("/candidates/:name", function(req, res){
   var desiredName = req.params.name;
-  var candidateOutput;
-  db.candidates.forEach(function(candidate){
-    if(desiredName === candidate.name){
-      candidateOutput = candidate;
-    }
+  Candidate.findOne({name: desiredName}).then(function(candidate){
+    res.render("candidates-show", {
+      candidate: candidate
+    });
   });
-  res.render("candidates-show", {
-    candidate: candidateOutput
+});
+
+// post form data
+app.post("/candidates", function(req, res){
+  // res.json(req.body);
+  Candidate.create(req.body.candidate).then(function(newCandidate){
+    res.redirect("/candidates/" + newCandidate.name);
   });
 });
 

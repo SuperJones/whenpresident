@@ -4,3 +4,11 @@
   <a href="/candidates/{{candidate.name}}">{{candidate.name}} for President in {{candidate.year}}</a>
 </h3>
 {{/each}}
+
+
+<!-- action is where its going and method is how it gets there. -->
+<form action="/candidates" method="post">
+  <input type="text" name="candidate[name]" placeholder="Name" />
+  <input type="number" name="candidate[year]" placeholder="Year" />
+  <button type="Submit">Run for Office</button>
+</form>
