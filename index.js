@@ -48,6 +48,12 @@ app.post("/candidates", function(req, res){
   });
 });
 
+app.post("/candidate/:name", function(req, res){
+  Candidate.findOneAndUpdate({name: req.params.name}, req.body.candidate, {new: true}).then(function(){
+    res.redirect("/candidates/" + candidate.name);
+  });
+});
+
 app.listen(app.get("port"), function(){
   console.log("It's aliiive!");
 });
